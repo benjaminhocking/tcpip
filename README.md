@@ -6,7 +6,3 @@ artificial tcpip simulation
 * Create hosts on the simulation
 * Create routers/switches for routing traffic
 * Allow user to intercept traffic (packets)
-
-* Tester edit
-
-* Changed
