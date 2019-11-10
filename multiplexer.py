@@ -2,7 +2,7 @@
 #		
 #
 #
-#
+#this is a test
 
 while True:
 	userData = input("String of four characters: ")
