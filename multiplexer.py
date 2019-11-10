@@ -24,7 +24,6 @@ def tcpHead(_sourcePort, _destinationPort, _sequenceNumber, _headerLength, _flag
 		return "Destination Port must be 16 bit"
 	if(len(_sequenceNumber)!= 4):
 		return "Sequence number must be 32 bit"
-	if(len(_headerLength)!=)
 	headerInit.append(_sourceIp)
 	print(len(headerInit))
 	print(headerInit)
