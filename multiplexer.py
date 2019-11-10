@@ -29,4 +29,4 @@ def tcpHead(_sourcePort, _destinationPort, _sequenceNumber, _headerLength, _flag
 	print(headerInit)
 	acknowledgementN = _sequenceNumber + _headerLength
 
-tcpHead(1,1,1,1,1,1,1, 1, 1)
+tcpHead(1,1,1,1,1,1,1,1,1)
