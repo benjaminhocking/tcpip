@@ -46,4 +46,8 @@ def createIP(_IPVersion, _tos, _identification, _flags, _ttl, _protocol, _source
 
 	return ipPacket
 
-print(createIP(format(4, "04b"), format(1, "08b"), format(1, "016b"), format(1, "03b"), format(1, "08b"), format(1, "08b"), format(1, "032b"), format(1, "032b"), format(100, "032b")))
+destinationIpT = format(192, "08b") + format(168, "08b") + format(8, "08b") + format(1, "08b")
+
+ipPacket1 = createIP(format(4, "04b"), format(1, "08b"), format(1, "016b"), format(1, "03b"), format(1, "08b"), format(1, "08b"), format(1, "032b"), destinationIpT, format(100, "032b"))
+
+#print(createIP(format(4, "04b"), format(1, "08b"), format(1, "016b"), format(1, "03b"), format(1, "08b"), format(1, "08b"), format(1, "032b"), format(1, "032b"), format(100, "032b")))
