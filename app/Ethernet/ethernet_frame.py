@@ -1,1 +1,3 @@
-def createEthernetFrame(destinationMac, sourceMac, tag, type, length, )
+def createEthernetFrame(destinationMac, sourceMac, ipDatagram):
+
+    print("----")
