@@ -1,5 +1,5 @@
 #dependencies:
-#		
+#
 #notes
 #	no window scaling option, only mss
 
@@ -68,7 +68,7 @@ def createTCPHead(_sourcePort, _destinationPort, _sequenceNumber, _flagBitN, _wi
 	headerInitArr[8] = checksum
 	headerInitArr[9] = _urgentPointer
 
-	_checksum = checksumTCPHeader(headerInitArr)
+	_checksum = checksumTCPHeader("".join(headerInitArr))
 
 	headerInitArr[8] = _checksum
 	separator = ""
@@ -81,8 +81,29 @@ def createTCPHead(_sourcePort, _destinationPort, _sequenceNumber, _flagBitN, _wi
 	return header
 
 def checksumTCPHeader(tcpArray):
-	return format(0, "016b")
+		tcpHeader16bits = []
+		for i in range(0,int(len(tcpArray)/16)):
+			tcpHeader16bits.append(tcpArray[i*16:(i*16)+16])
+		counter = "0"
+		for x in range(0, len(tcpHeader16bits)):
+			thisAddition = int(counter,2)+int(tcpHeader16bits[x], 2)
+			sumBin = format(thisAddition, "017b")
+			if(sumBin[0]=="1"):
+				sumBinArr = list(sumBin)
+				sumBinArr[0] = "0"
+				sumBinArr[16] = "1"
+				sumBin = "".join(sumBinArr)
+			counter = sumBin
+		countArr = list(counter)
+		del countArr[0]
+		for x in range(0, len(countArr)):
+			if countArr[x] == "0":
+				countArr[x]="1"
+			else:
+				countArr[x]="0"
+		counter = "".join(countArr)
+		return counter
 
 dataEx = format(1203, "014b")
 
-print(createTCP(format(1, "016b"), format(1, "016b"), format(1, "032b"), format(1, "06b"), format(1, "016b"), format(1, "016b"), format(0, "032b"), format(1203, "014b")))
+#print(createTCP(format(1, "016b"), format(1, "016b"), format(1, "032b"), format(1, "06b"), format(1, "016b"), format(1, "016b"), format(0, "032b"), format(1203, "014b")))

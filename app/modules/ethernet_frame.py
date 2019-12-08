@@ -1,4 +1,6 @@
 import ip_header as ip
+import zlib
+import binascii
 arpCacheEntries = []
 macAdress = "0"
 f=open("ComputerSettings/settings.txt", "r")
@@ -11,19 +13,25 @@ def readArpCache():
         arpCacheEntries.append(arpCacheLines[i].split("|"))
 
 def createEthernetFrame(_sourceMac, _ipDatagram):
-    ethernetFrame = [checkForIpInARPCache(), convertMacToBin(_sourceMac), format(800, "016b"), _ipDatagram, format(0, "032b")]
+    destinationIp = _ipDatagram[128:160]
+    ethernetFrameWithoutIpDatagram = [checkForIpInARPCache(destinationIp), convertMacToBin(_sourceMac), format(800, "016b")]
+    ethernetFrameWithoutIpDatagramBin = "".join(ethernetFrameWithoutIpDatagram)
+    crc = calcCRC(ethernetFrameWithoutIpDatagramBin)
+    ethernetFrame = [checkForIpInARPCache(destinationIp), convertMacToBin(_sourceMac), format(800, "016b"), _ipDatagram]
+    ethernetFrame.append(crc)
     ethernetFrame = "".join(ethernetFrame)
-    print(len(_ipDatagram))
+    return ethernetFrame
 
-def checkForIpInARPCache():
-    ipAddBin = ip.ipPacket1[128:160]
+def checkForIpInARPCache(_ipAdress):
+    readArpCache()
+    ipAddBin = _ipAdress
+    macAdress = "0"
     ipAddArr = []
     for x in range(0, 4):
         ipAddArr.append(ipAddBin[x*8:(x*8)+8])
     for x in range(0,4):
         ipAddArr[x] = str(int(ipAddArr[x], 2))
     ipAddStr = ".".join(ipAddArr)
-    print(ipAddStr)
     for x in range(0, len(arpCacheEntries)):
         if arpCacheEntries[x][0] == ipAddStr:
             macAdress = arpCacheEntries[x][1]
@@ -33,6 +41,12 @@ def checkForIpInARPCache():
         print("Mac Adress not found")
     return macAdress
 
+def calcCRC(_ethernetFrameWithoutIPDatagram):
+    testBytes = int(_ethernetFrameWithoutIPDatagram, 2) #convert to integer
+    ethernetFrameBytes = testBytes.to_bytes(14, byteorder="little") #convert integer to bytes
+    crcValue = format(binascii.crc32(ethernetFrameBytes), "032b") #calculate crc-32 from bytes
+    return crcValue #return calculated crc value
+
 def convertMacToBin(_macAdd):
     macAdressArr = _macAdd.split(':')
     for x in range(0, 6):
@@ -40,5 +54,5 @@ def convertMacToBin(_macAdd):
     macAdress = "".join(macAdressArr)
     return macAdress
 
-readArpCache()
-createEthernetFrame(thisMac, ip.ipPacket1)
+
+#print(createEthernetFrame(thisMac, ip.ipPacket1))
