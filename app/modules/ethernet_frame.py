@@ -29,6 +29,7 @@ def checkForIpInARPCache(_ipAdress):
     ipAddArr = []
     for x in range(0, 4):
         ipAddArr.append(ipAddBin[x*8:(x*8)+8])
+    print(ipAddArr)
     for x in range(0,4):
         ipAddArr[x] = str(int(ipAddArr[x], 2))
     ipAddStr = ".".join(ipAddArr)

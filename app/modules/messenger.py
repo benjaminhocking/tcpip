@@ -16,11 +16,8 @@ def ipBinaryValue(_ipString):
     return "".join(ipArr)
 
 def createFrame(_fromIP, _toIP, _message):
-    tcpPacket = tcp.createTCP(format(1, "016b"), format(1, "016b"), format(0, "032b"), format(0,"06b"), format(0,"016b"), format(0, "016b"), format(0, "032b"), _message) #send and listen on port 1, sequence number not currently in use, no flags, window size not in use, urgent pointer off, no options in use
+    tcpPacket = tcp.createTCP(format(1, "016b"), format(1, "016b"), format(0, "032b"), format(0,"06b"), format(0,"016b"), format(0, "016b"), format(0, "032b"), messageToASCII(_message)) #send and listen on port 1, sequence number not currently in use, no flags, window size not in use, urgent pointer off, no options in use
     ipPacket = ip.createIP(format(4, "04b"), format(0, "08b"), format(0, "016b"), format(0, "03b"), format(64, "08b"), format(6, "08b"), ipBinaryValue(_fromIP), ipBinaryValue(_toIP), tcpPacket) #IPv4, normal type of service, no identification, 64 hops, protocol field = 6 (TCP), no flags
-    ethernetFrame = ethernet.createEthernetFrame(thisMac, ipPacket)
-    return ethernetFrame
 
-message = input("Message to send: ")
-frame = createFrame("192.168.8.1", "192.168.8.8", messageToASCII(message))
-print(frame)
+    ethernetFrame = ethernet.createEthernetFrame(ethernet.checkForIpInARPCache(ipBinaryValue(_fromIP)), ipPacket)
+    return ethernetFrame
