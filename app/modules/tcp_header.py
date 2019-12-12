@@ -1,11 +1,4 @@
-#dependencies:
-#
-#notes
-#	no window scaling option, only mss
-
-
 def createTCP(_sourcePort, _destinationPort, _sequenceNumber, _flagBitN, _windowSize, _urgentPointer, _options, _data):
-	#top level function
 	header = createTCPHead(_sourcePort, _destinationPort, _sequenceNumber, _flagBitN, _windowSize, _urgentPointer)
 	mss = fillTCPHeaderOptions(_options)
 	data = _data
@@ -103,7 +96,3 @@ def checksumTCPHeader(tcpArray):
 				countArr[x]="0"
 		counter = "".join(countArr)
 		return counter
-
-dataEx = format(1203, "014b")
-
-#print(createTCP(format(1, "016b"), format(1, "016b"), format(1, "032b"), format(1, "06b"), format(1, "016b"), format(1, "016b"), format(0, "032b"), format(1203, "014b")))

@@ -1,8 +1,6 @@
 import messenger
 import threading
-settings = ["192.168.8.1"]
-outWrite = ""
-inRead = ""
+settings = ["192.168.8.1", "cc:96:10:16:57:66"]
 wire1 = ""
 loWire = ""
 listening = False
@@ -10,7 +8,6 @@ listening = False
 def readWire2():
     f = open("Wires/wire2.txt", "r")
     wire2 = f.read()
-    #print(wire2)
     return wire2
 
 def writeLo(_output):
@@ -64,7 +61,9 @@ def message(_queryString):
     if isIP(arr[2])!= True:
         print("IP format incorrect")
         return
-    frame = messenger.createFrame(arr[1], arr[2], arr[3])
+    fullMessage = arr[3:len(arr)]
+    fullMessageStr = " ".join(fullMessage)
+    frame = messenger.createFrame(arr[1], arr[2], fullMessageStr)
     if arr[2] == arr[1]:
         writeLo(frame)
         print("written to loopback interface")

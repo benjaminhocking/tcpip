@@ -1,6 +1,6 @@
 import messenger
 import threading
-settings = ["192.168.8.8"]
+settings = ["192.168.8.8", "4c:e6:76:2e:f2:64"]
 outWrite = ""
 inRead = ""
 wire2 = ""
@@ -63,7 +63,9 @@ def message(_queryString):
     if isIP(arr[2])!= True:
         print("IP format incorrect")
         return
-    frame = messenger.createFrame(arr[1], arr[2], arr[3])
+    fullMessage = arr[3:len(arr)]
+    fullMessageStr = " ".join(fullMessage)
+    frame = messenger.createFrame(arr[1], arr[2], fullMessageStr)
     if arr[2] == arr[1]:
         writeLo(frame)
         print("written to loopback interface")

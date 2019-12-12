@@ -73,7 +73,3 @@ def calcChecksum(_ipHeader):
 			countArr[x]="0"
 	counter = "".join(countArr)
 	return counter
-
-destinationIpT = format(192, "08b") + format(168, "08b") + format(8, "08b") + format(1, "08b")
-
-ipPacket1 = createIP(format(4, "04b"), format(1, "08b"), format(1, "016b"), format(1, "03b"), format(1, "08b"), format(1, "08b"), format(1, "032b"), destinationIpT, format(100, "032b"))

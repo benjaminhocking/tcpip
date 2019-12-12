@@ -5,33 +5,6 @@ import demultiplexer
 from time import sleep
 computerN = -1
 userInput = ""
-"""
-while True:
-    compIP = input("IP adress of computer to control: ")
-    if computer1.isIP(compIP):
-        print("Connecting...")
-        f = open("Network/net.txt", "r")
-        allIpAdresses = f.read()
-        ipAdressesArr = allIpAdresses.splitlines()
-        found = False
-        for x in ipAdressesArr:
-            if x == compIP:
-                found = True
-        sleep(2)
-        if found:
-            print("Success")
-            break
-        else:
-            print("IP Adress not found")
-
-    else:
-        print("Please enter valid IP address")
-if compIP == "192.168.8.1":
-    computerN = 1
-elif compIP == "192.168.8.8":
-    computerN = 2
-"""
-
 def listener():
     while True:
         userInput=  input(">> ")

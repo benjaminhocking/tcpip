@@ -14,13 +14,13 @@ def readArpCache():
 
 def createEthernetFrame(_sourceMac, _ipDatagram):
     destinationIp = _ipDatagram[128:160]
-    ethernetFrameWithoutIpDatagram = [checkForIpInARPCache(destinationIp), convertMacToBin(_sourceMac), format(800, "016b")]
+    ethernetFrameWithoutIpDatagram = [checkForIpInARPCache(destinationIp), _sourceMac, format(800, "016b")]
     ethernetFrameWithoutIpDatagramBin = "".join(ethernetFrameWithoutIpDatagram)
     crc = calcCRC(ethernetFrameWithoutIpDatagramBin)
-    ethernetFrame = [checkForIpInARPCache(destinationIp), convertMacToBin(_sourceMac), format(800, "016b"), _ipDatagram]
-    ethernetFrame.append(crc)
-    ethernetFrame = "".join(ethernetFrame)
-    return ethernetFrame
+    ethernetFrameWithoutIpDatagram.append(_ipDatagram)
+    ethernetFrameWithoutIpDatagram.append(crc)
+    ethernetFrameStr = "".join(ethernetFrameWithoutIpDatagram)
+    return ethernetFrameStr
 
 def checkForIpInARPCache(_ipAdress):
     readArpCache()
@@ -29,7 +29,6 @@ def checkForIpInARPCache(_ipAdress):
     ipAddArr = []
     for x in range(0, 4):
         ipAddArr.append(ipAddBin[x*8:(x*8)+8])
-    print(ipAddArr)
     for x in range(0,4):
         ipAddArr[x] = str(int(ipAddArr[x], 2))
     ipAddStr = ".".join(ipAddArr)
@@ -49,11 +48,8 @@ def calcCRC(_ethernetFrameWithoutIPDatagram):
     return crcValue #return calculated crc value
 
 def convertMacToBin(_macAdd):
-    macAdressArr = _macAdd.split(':')
+    macAddressArr = _macAdd.split(':')
     for x in range(0, 6):
-        macAdressArr[x] = format(int(macAdressArr[x],16), "08b")
-    macAdress = "".join(macAdressArr)
-    return macAdress
-
-
-#print(createEthernetFrame(thisMac, ip.ipPacket1))
+        macAddressArr[x] = format(int(macAddressArr[x],16), "08b")
+    macAddress = "".join(macAddressArr)
+    return macAddress
