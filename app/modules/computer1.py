@@ -50,7 +50,7 @@ def demultiplexPacket():
     return demultiplexedString
 
 def message(_queryString):
-    #in format : message {source IP} {desination IP} {message}
+    #in format : message {desination IP} {message}
     arr = _queryString.split(" ")
     if arr[0] != "message":
         print("non-logical query")
@@ -58,13 +58,10 @@ def message(_queryString):
     if isIP(arr[1])!= True:
         print("IP format incorrect")
         return
-    if isIP(arr[2])!= True:
-        print("IP format incorrect")
-        return
-    fullMessage = arr[3:len(arr)]
+    fullMessage = arr[2:len(arr)]
     fullMessageStr = " ".join(fullMessage)
-    frame = messenger.createFrame(arr[1], arr[2], fullMessageStr)
-    if arr[2] == arr[1]:
+    frame = messenger.createFrame(settings[0], arr[1], fullMessageStr)
+    if arr[1] == settings[0]:
         writeLo(frame)
         print("written to loopback interface")
     else:
