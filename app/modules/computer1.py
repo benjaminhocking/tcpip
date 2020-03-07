@@ -1,9 +1,26 @@
 import messenger
 import threading
-settings = ["192.168.8.1", "cc:96:10:16:57:66"]
+import dns
+import udp_header
+import ip_header
+from time import sleep
+settings = ["192.168.8.1", "cc:96:10:16:57:66", "moscow"]
+dnsSeverIP = "192.186.8.9"
 wire1 = ""
 loWire = ""
 listening = False
+global identification
+identification = 0
+
+def writeToDns(output):
+    f = open("Wires/computer1___dns.txt", "w")
+    f.write(output)
+    f.close()
+
+def readDns():
+    f = open("Wires/dns___computer1.txt", "r")
+    x = f.read()
+    return x
 
 def readWire2():
     f = open("Wires/wire2.txt", "r")
@@ -24,6 +41,13 @@ def writeWire1(_output):
     f = open("Wires/wire1.txt", "w")
     f.write(_output)
     f.close()
+
+def messageToASCII(message):
+    asciiArr = []
+    for x in message:
+        asciiArr.append(format(ord(x), "07b"))
+    return "".join(asciiArr)
+    return ord(message)
 
 def isIP(_ipAddress):
     arr = _ipAddress.split(".")
@@ -52,12 +76,15 @@ def demultiplexPacket():
 def message(_queryString):
     #in format : message {desination IP} {message}
     arr = _queryString.split(" ")
+    destinaionIP = ""
+    if isIP(arr[1]):
+        destinationIP = arr[1]
+    else:
+        destinationIP = dnsRequest(arr[1])
     if arr[0] != "message":
         print("non-logical query")
         return
-    if isIP(arr[1])!= True:
-        print("IP format incorrect")
-        return
+
     fullMessage = arr[2:len(arr)]
     fullMessageStr = " ".join(fullMessage)
     frame = messenger.createFrame(settings[0], arr[1], fullMessageStr)
@@ -67,3 +94,40 @@ def message(_queryString):
     else:
         writeWire1(frame)
         print("written to wire1")
+
+def ipBinToEng(ipBin):
+    ipBinArr = []
+    for i in range(4):
+        ipBinI = ipBin[i*8: i*8+8]
+        ipBinArr.append(str(int(ipBinI, 2)))
+    ipEng = ".".join(ipBinArr)
+    return ipEng
+
+def ipEngToArpa(ipAddress):
+    ipArr = ipAddress.split(".")
+    newArr = []
+    for i in range(4):
+        newArr.append(ipArr[len(ipArr)-i-1])
+    newArrStr = ".".join(newArr)
+    fqdn =  newArrStr + ".in-addr.arpa."
+    return fqdn
+
+def dnsRequest(serverName):
+    print("Using DNS server", dnsSeverIP)
+    identification = 1
+    serverNameBin = messageToASCII(serverName)
+    dnsPacket = [format(identification, "016b"), "0", "0000", format(len(serverNameBin), "08b"), serverNameBin]
+    dnsPacket = "".join(dnsPacket)
+    dnsUDP = udp_header.createUDP(1447, 53, dnsPacket)
+    ipPacket = ip_header.createIP(format(4, "04b"), format(0, "08b"), format(0, "016b"), format(0, "03b"), format(64, "08b"), format(6, "08b"), messenger.ipBinaryValue(settings[0]), messenger.ipBinaryValue(dnsSeverIP),dnsUDP)
+    dnsPacketBin = "".join(ipPacket)
+    writeToDns(dnsPacketBin)
+    sleep(0.5)
+    dns.replyToRequest(settings[2])
+    sleep(0.5)
+    returnPacket = readDns()
+    ipBin = returnPacket[16:]
+    ipEng = ipBinToEng(ipBin)
+    fqdn = ipEngToArpa(ipEng)
+    print(serverName, ":", ipEng , ",", fqdn)
+    return ipEng

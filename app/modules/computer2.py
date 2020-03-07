@@ -1,10 +1,25 @@
 import messenger
 import threading
-settings = ["192.168.8.8", "4c:e6:76:2e:f2:64"]
+import udp_header
+import ip_header
+import dns
+from time import sleep
+dnsSeverIP = "192.168.8.9"
+settings = ["192.168.8.8", "4c:e6:76:2e:f2:64", "denver"]
 outWrite = ""
 inRead = ""
 wire2 = ""
 listening = False
+
+def writeToDns(output):
+    f = open("Wires/computer2___dns.txt", "w")
+    f.write(output)
+    f.close()
+
+def readDns():
+    f = open("Wires/dns___computer2.txt", "r")
+    x = f.read()
+    return x
 
 def readWire1():
     f = open("Wires/wire1.txt", "r")
@@ -26,6 +41,13 @@ def writeWire2(_output):
     f = open("Wires/wire2.txt", "w")
     f.write(_output)
     f.close()
+
+def messageToASCII(message):
+    asciiArr = []
+    for x in message:
+        asciiArr.append(format(ord(x), "07b"))
+    return "".join(asciiArr)
+    return ord(message)
 
 def isIP(_ipAddress):
     arr = _ipAddress.split(".")
@@ -69,3 +91,29 @@ def message(_queryString):
     else:
         writeWire2(frame)
         print("written to wire2")
+
+def ipBinToEng(ipBin):
+    ipBinArr = []
+    for i in range(4):
+        ipBinI = ipBin[i*8: i*8+8]
+        ipBinArr.append(str(int(ipBinI, 2)))
+    ipEng = ".".join(ipBinArr)
+    return ipEng
+
+def dnsRequest(serverName):
+    identification = 1
+    serverNameBin = messageToASCII(serverName)
+    dnsPacket = [format(identification, "016b"), "0", "0000", format(len(serverNameBin), "08b"), serverNameBin]
+    dnsPacket = "".join(dnsPacket)
+    dnsUDP = udp_header.createUDP(1447, 53, dnsPacket)
+    ipPacket = ip_header.createIP(format(4, "04b"), format(0, "08b"), format(0, "016b"), format(0, "03b"), format(64, "08b"), format(6, "08b"), messenger.ipBinaryValue(settings[0]), messenger.ipBinaryValue(dnsSeverIP),dnsUDP)
+    dnsPacketBin = "".join(ipPacket)
+    writeToDns(dnsPacketBin)
+    sleep(0.5)
+    dns.replyToRequest(settings[2])
+    sleep(0.5)
+    returnPacket = readDns()
+    ipBin = returnPacket[16:]
+    ipEng = ipBinToEng(ipBin)
+    print(ipEng)
+    return ipEng
